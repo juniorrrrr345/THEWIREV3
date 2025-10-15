@@ -188,7 +188,7 @@ async function handleInit(env, corsHeaders) {
       const defaultAdminId = crypto.randomUUID()
       const now = new Date().toISOString()
       await env.DB.prepare(`
-        INSERT INTO admin_users (id, username, password, createdAt, updatedAt)
+        INSERT INTO admin_users (id, username, password, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?)
       `).bind(defaultAdminId, defaultUsername, defaultPassword, now, now).run()
     }
@@ -303,7 +303,7 @@ function transformProduct(p) {
 }
 
 async function getProducts(env, corsHeaders) {
-  const { results } = await env.DB.prepare('SELECT * FROM products ORDER BY createdAt DESC').all()
+  const { results } = await env.DB.prepare('SELECT * FROM products ORDER BY created_at DESC').all()
   
   // Transformer les produits pour avoir toujours des variants
   const products = results.map(transformProduct)
@@ -333,7 +333,7 @@ async function createProduct(request, env, corsHeaders) {
   const id = data.id || Date.now().toString()
   
   await env.DB.prepare(`
-    INSERT OR REPLACE INTO products (id, name, description, category, farm, photo, video, medias, variants, price, createdAt, updatedAt)
+    INSERT OR REPLACE INTO products (id, name, description, category, farm, photo, video, medias, variants, price, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     id,
@@ -346,7 +346,7 @@ async function createProduct(request, env, corsHeaders) {
     JSON.stringify(data.medias || []),
     JSON.stringify(data.variants || []),
     data.price,
-    data.createdAt || new Date().toISOString(),
+    data.created_at || new Date().toISOString(),
     new Date().toISOString()
   ).run()
 
@@ -359,7 +359,7 @@ async function updateProduct(id, request, env, corsHeaders) {
   const data = await request.json()
   
   await env.DB.prepare(`
-    INSERT OR REPLACE INTO products (id, name, description, category, farm, photo, video, medias, variants, price, createdAt, updatedAt)
+    INSERT OR REPLACE INTO products (id, name, description, category, farm, photo, video, medias, variants, price, created_at, updated_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     id,
@@ -372,7 +372,7 @@ async function updateProduct(id, request, env, corsHeaders) {
     JSON.stringify(data.medias || []),
     JSON.stringify(data.variants || []),
     data.price,
-    data.createdAt || new Date().toISOString(),
+    data.created_at || new Date().toISOString(),
     new Date().toISOString()
   ).run()
 
@@ -664,7 +664,7 @@ async function loginAdmin(request, env, corsHeaders) {
 
 // ============ ADMIN USERS ============
 async function getAdminUsers(env, corsHeaders) {
-  const { results } = await env.DB.prepare('SELECT id, username, createdAt, updatedAt FROM admin_users ORDER BY createdAt DESC').all()
+  const { results } = await env.DB.prepare('SELECT id, username, created_at, updated_at FROM admin_users ORDER BY created_at DESC').all()
   
   return new Response(JSON.stringify(results), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -690,7 +690,7 @@ async function createAdminUser(request, env, corsHeaders) {
     }
     
     await env.DB.prepare(`
-      INSERT INTO admin_users (id, username, password, createdAt, updatedAt)
+      INSERT INTO admin_users (id, username, password, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?)
     `).bind(id, data.username, data.password, now, now).run()
 
